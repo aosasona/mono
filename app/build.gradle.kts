@@ -6,11 +6,12 @@ plugins {
 
 android {
     namespace = "tools.keystroke.mono"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "tools.keystroke.mono"
         minSdk = 33
+        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
