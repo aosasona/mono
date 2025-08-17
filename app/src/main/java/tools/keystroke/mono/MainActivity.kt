@@ -14,6 +14,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { MonoTheme { Scaffold(modifier = Modifier.fillMaxSize()) { _ -> HomeView() } } }
+        setContent {
+            MonoTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+                    HomeView(paddingValues)
+                }
+            }
+        }
     }
 }
