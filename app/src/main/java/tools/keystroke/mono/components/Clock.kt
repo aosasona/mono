@@ -97,11 +97,10 @@ fun Clock(
     }
 
 
-    Column(horizontalAlignment = Alignment.Start, modifier = modifier) {
+    Column(horizontalAlignment = Alignment.Start, modifier = modifier.fillMaxWidth()) {
         if (showDate) {
             Text(
                 text = currentDate.format(now),
-                modifier = modifier,
                 style =
                     TextStyle(
                         color = MaterialTheme.colorScheme.onBackground,
@@ -115,7 +114,7 @@ fun Clock(
 
         Row(
             verticalAlignment = Alignment.Top,
-            modifier = modifier
+            modifier = Modifier
                 .height(IntrinsicSize.Min)
                 .offset(y = (-(dateSize * .5f)).dp)
         ) {
@@ -141,7 +140,7 @@ fun Clock(
             if (!use24HourFormat) {
                 Text(
                     text = DateTimeFormatter.ofPattern("a", Locale.getDefault()).format(now),
-                    modifier = modifier.padding(top = 16.dp, start = 4.dp),
+                    modifier = Modifier.padding(top = 16.dp, start = 4.dp),
                     style =
                         TextStyle(
                             color = MaterialTheme.colorScheme.onBackground,

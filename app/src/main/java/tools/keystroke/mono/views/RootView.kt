@@ -1,6 +1,5 @@
 package tools.keystroke.mono.views
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -18,13 +17,14 @@ import tools.keystroke.mono.ui.theme.MonoTheme
 fun HomeView(
     paddingValues: PaddingValues, modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.padding(paddingValues),
-    ) {
-        HomeStatusBar()
-        Spacer(modifier = Modifier.padding(12.dp))
+    val paddingModifier = Modifier.padding(horizontal = 14.dp)
 
-        Clock()
+    Column {
+        HomeStatusBar(modifier = paddingModifier)
+
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        Clock(modifier = paddingModifier)
 
         Spacer(modifier = Modifier)
     }
