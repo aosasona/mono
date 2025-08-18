@@ -1,5 +1,6 @@
 package tools.keystroke.mono.views
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -15,11 +16,14 @@ import tools.keystroke.mono.ui.theme.MonoTheme
 @Composable
 // TODO: load user settings
 fun HomeView(
-    paddingValues: PaddingValues,
-    modifier: Modifier = Modifier
+    paddingValues: PaddingValues, modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.padding(paddingValues)) {
+    Column(
+        modifier = modifier.padding(paddingValues),
+    ) {
         HomeStatusBar()
+        Spacer(modifier = Modifier.padding(12.dp))
+
         Clock()
 
         Spacer(modifier = Modifier)

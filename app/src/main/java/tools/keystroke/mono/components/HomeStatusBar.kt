@@ -10,6 +10,9 @@ import android.net.NetworkCapabilities
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,20 +82,15 @@ fun rememberBatteryLevel(context: Context): BatteryState {
     return state
 }
 
-enum class ConnectionStrength {
-    EXCELLENT, GOOD, FAIR, POOR, NONE
-}
-
 data class ConnectionState(
-    val hasInternetAccess: Boolean,
-    val strength: ConnectionStrength? = ConnectionStrength.NONE,
+    val hasInternetAccess: Boolean, val strength: Int = 0
 )
 
 @Composable
 fun rememberConnectionState(context: Context): ConnectionState {
     var state by remember {
         mutableStateOf(
-            ConnectionState(hasInternetAccess = false, strength = null)
+            ConnectionState(hasInternetAccess = false, strength = 0)
         )
     }
 
@@ -104,18 +103,19 @@ fun rememberConnectionState(context: Context): ConnectionState {
             capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
 
         if (capabilities == null || !capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            return ConnectionState(hasInternetAccess = hasInternetAccess, strength = null)
+            return ConnectionState(hasInternetAccess = hasInternetAccess, strength = 0)
         }
 
         val wifiInfo = capabilities.transportInfo as WifiInfo?
         val rssi = wifiInfo?.rssi
         return ConnectionState(
             hasInternetAccess = hasInternetAccess, strength = when {
-                rssi == null -> ConnectionStrength.NONE
-                rssi >= -50 -> ConnectionStrength.EXCELLENT
-                rssi >= -60 -> ConnectionStrength.GOOD
-                rssi >= -70 -> ConnectionStrength.FAIR
-                else -> ConnectionStrength.POOR
+                rssi == null -> 0
+                rssi >= -50 -> 4
+                rssi >= -60 -> 3
+                rssi >= -70 -> 2
+                rssi >= -80 -> 1
+                else -> 0
             }
         )
     }
@@ -149,23 +149,41 @@ fun rememberConnectionState(context: Context): ConnectionState {
 }
 
 @Composable
-fun ConnectionStateBar(active: Boolean) {
-}
-
-@Composable
 fun ConnectionStateIndicator(
+    height: Dp = 12.dp,
     state: ConnectionState,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier.fillMaxWidth()) {
-        if (!state.hasInternetAccess) {
-            return Text(
+    if (!state.hasInternetAccess) {
+        return Row {
+            Text(
                 text = "No Internet",
                 modifier = modifier,
                 color = MaterialTheme.colorScheme.error,
                 fontFamily = mozillaTextFamily,
                 fontWeight = FontWeight.Light,
-                fontSize = 14.sp,
+                fontSize = (height * 0.75f).value.sp
+            )
+        }
+    }
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+
+        for (i in 1..4) {
+            val active = i <= state.strength
+            Box(
+                Modifier
+                    .width((height * 0.6f))
+                    .height(height) // ascending heights
+                    .background(
+                        if (active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = 0.5f
+                        )
+                    )
             )
         }
     }
@@ -174,7 +192,7 @@ fun ConnectionStateIndicator(
 
 @Composable
 fun HomeStatusBar(
-    height: Dp = 28.dp,
+    height: Dp = 20.dp,
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
     connectionState: ConnectionState = rememberConnectionState(context = context),
@@ -185,6 +203,7 @@ fun HomeStatusBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         ConnectionStateIndicator(
+            height = height,
             state = connectionState,
             modifier = Modifier.weight(1f),
         )
@@ -196,24 +215,27 @@ fun HomeStatusBar(
 @Preview(showBackground = true)
 @Composable
 fun HomeStatusBarPreview() {
-    Column(modifier = Modifier.padding(paddingValues = PaddingValues(16.dp))) {
+    Column(
+        modifier = Modifier.padding(paddingValues = PaddingValues(16.dp)),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
         HomeStatusBar(
-            height = 28.dp, modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
-                hasInternetAccess = false, strength = ConnectionStrength.NONE
+            modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
+                hasInternetAccess = false, strength = 0
             )
         )
         Spacer(modifier = Modifier)
 
         HomeStatusBar(
-            height = 28.dp, modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
-                hasInternetAccess = true, strength = ConnectionStrength.GOOD
+            modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
+                hasInternetAccess = true, strength = 3
             )
         )
         Spacer(modifier = Modifier)
 
         HomeStatusBar(
-            height = 28.dp, modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
-                hasInternetAccess = true, strength = ConnectionStrength.EXCELLENT
+            modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
+                hasInternetAccess = true, strength = 4
             )
         )
         Spacer(modifier = Modifier)
