@@ -108,7 +108,7 @@ fun ConnectionStateIndicator(
     state: ConnectionState,
     modifier: Modifier = Modifier,
 ) {
-    val fontSize = (height * 0.75f).value.sp
+    val fontSize = (height * 0.8f).value.sp
 
     if (!state.isConnected) {
         return Row {
@@ -117,7 +117,7 @@ fun ConnectionStateIndicator(
                 modifier = modifier,
                 color = MaterialTheme.colorScheme.error,
                 fontFamily = mozillaTextFamily,
-                fontWeight = FontWeight.Light,
+                fontWeight = FontWeight.Normal,
                 fontSize = fontSize
             )
         }
@@ -130,7 +130,7 @@ fun ConnectionStateIndicator(
                 modifier = modifier,
                 color = MaterialTheme.colorScheme.error,
                 fontFamily = mozillaTextFamily,
-                fontWeight = FontWeight.Light,
+                fontWeight = FontWeight.Normal,
                 fontSize = fontSize
             )
         }

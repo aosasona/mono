@@ -17,12 +17,12 @@ import tools.keystroke.mono.ui.theme.MonoTheme
 fun HomeView(
     paddingValues: PaddingValues, modifier: Modifier = Modifier
 ) {
-    val paddingModifier = Modifier.padding(horizontal = 14.dp)
+    val paddingModifier = Modifier.padding(horizontal = 16.dp)
 
     Column {
         HomeStatusBar(modifier = paddingModifier)
 
-        Spacer(modifier = Modifier.padding(10.dp))
+        Spacer(modifier = Modifier.padding(18.dp))
 
         Clock(modifier = paddingModifier)
 

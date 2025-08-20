@@ -30,7 +30,7 @@ fun HomeStatusBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(height + 16.dp),
+            .height(height + 28.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         ConnectionStateIndicator(height = height, state = connectionState)

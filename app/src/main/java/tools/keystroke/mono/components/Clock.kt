@@ -106,7 +106,7 @@ fun Clock(
                         color = MaterialTheme.colorScheme.onBackground,
                         fontFamily = mozillaTextFamily,
                         fontSize = dateSize.sp,
-                        fontWeight = FontWeight.ExtraLight,
+                        fontWeight = FontWeight.Light,
                         textAlign = TextAlign.Start,
                     )
             )
