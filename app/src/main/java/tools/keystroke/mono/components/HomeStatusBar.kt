@@ -50,21 +50,28 @@ fun HomeStatusBarPreview() {
     ) {
         HomeStatusBar(
             modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
-                hasInternetAccess = false, strength = 0
+                isConnected = true, hasInternetAccess = false, strength = 0
             )
         )
         Spacer(modifier = Modifier)
 
         HomeStatusBar(
             modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
-                hasInternetAccess = true, strength = 3
+                isConnected = true, hasInternetAccess = true, strength = 3
             )
         )
         Spacer(modifier = Modifier)
 
         HomeStatusBar(
             modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
-                hasInternetAccess = true, strength = 4
+                isConnected = true, hasInternetAccess = true, strength = 4
+            )
+        )
+        Spacer(modifier = Modifier)
+
+        HomeStatusBar(
+            modifier = Modifier.fillMaxWidth(), connectionState = ConnectionState(
+                isConnected = false, hasInternetAccess = false, strength = 0
             )
         )
         Spacer(modifier = Modifier)
