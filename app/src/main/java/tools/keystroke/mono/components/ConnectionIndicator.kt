@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import tools.keystroke.mono.ui.theme.mozillaTextFamily
 
 data class ConnectionState(
-    val hasInternetAccess: Boolean, val strength: Int = 0
+    val isConnected: Boolean, val hasInternetAccess: Boolean, val strength: Int = 0
 )
 
 // TODO: represent "Not connected" state (currently, we just have "No Internet" state)
@@ -38,7 +38,7 @@ data class ConnectionState(
 fun rememberConnectionState(context: Context): ConnectionState {
     var state by remember {
         mutableStateOf(
-            ConnectionState(hasInternetAccess = false, strength = 0)
+            ConnectionState(isConnected = false, hasInternetAccess = false, strength = 0)
         )
     }
 
@@ -46,18 +46,24 @@ fun rememberConnectionState(context: Context): ConnectionState {
         connectivityManager: ConnectivityManager,
     ): ConnectionState {
         val network = connectivityManager.activeNetwork
+        if (network == null) {
+            return ConnectionState(isConnected = false, hasInternetAccess = false, strength = 0)
+        }
+
         val capabilities = connectivityManager.getNetworkCapabilities(network)
         val hasInternetAccess =
             capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
 
         if (capabilities == null || !capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            return ConnectionState(hasInternetAccess = hasInternetAccess, strength = 0)
+            return ConnectionState(
+                isConnected = true, hasInternetAccess = hasInternetAccess, strength = 0
+            )
         }
 
         val wifiInfo = capabilities.transportInfo as WifiInfo?
         val rssi = wifiInfo?.rssi
         return ConnectionState(
-            hasInternetAccess = hasInternetAccess, strength = when {
+            isConnected = true, hasInternetAccess = hasInternetAccess, strength = when {
                 rssi == null -> 0
                 rssi >= -50 -> 4
                 rssi >= -60 -> 3
@@ -102,6 +108,21 @@ fun ConnectionStateIndicator(
     state: ConnectionState,
     modifier: Modifier = Modifier,
 ) {
+    val fontSize = (height * 0.75f).value.sp
+
+    if (!state.isConnected) {
+        return Row {
+            Text(
+                text = "Not Connected",
+                modifier = modifier,
+                color = MaterialTheme.colorScheme.error,
+                fontFamily = mozillaTextFamily,
+                fontWeight = FontWeight.Light,
+                fontSize = fontSize
+            )
+        }
+    }
+
     if (!state.hasInternetAccess) {
         return Row {
             Text(
@@ -110,7 +131,7 @@ fun ConnectionStateIndicator(
                 color = MaterialTheme.colorScheme.error,
                 fontFamily = mozillaTextFamily,
                 fontWeight = FontWeight.Light,
-                fontSize = (height * 0.75f).value.sp
+                fontSize = fontSize
             )
         }
     }
@@ -125,11 +146,14 @@ fun ConnectionStateIndicator(
             val active = i <= state.strength
             val size = height * 0.75f
             Box(
-                Modifier.size(size).clip(CircleShape).background(
-                    if (active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = 0.5f
+                Modifier
+                    .size(size)
+                    .clip(CircleShape)
+                    .background(
+                        if (active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = 0.5f
+                        )
                     )
-                )
             )
         }
     }
