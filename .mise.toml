@@ -1,0 +1,3 @@
+[tasks.open]
+run = "unset DYLD_LIBRARY_PATH && open -a \"Android Studio\""
+dir = "."
