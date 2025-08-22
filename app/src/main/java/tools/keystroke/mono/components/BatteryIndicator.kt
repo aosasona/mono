@@ -84,7 +84,7 @@ fun BatteryIndicator(
     state: BatteryState,
     height: Dp = 12.dp,
     width: Dp = (height * 2.4f).coerceAtLeast(40.dp),
-    radius: Float = 10f,
+    radius: Float = 5f,
     showPercentage: Boolean = true,
     percentageSide: PercentageSide = PercentageSide.RIGHT,
     lowBatteryThreshold: Int = 10,
