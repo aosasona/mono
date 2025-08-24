@@ -52,9 +52,9 @@ data class FavoriteApps(
 @Composable
 fun Dock(
     modifier: Modifier = Modifier,
-    height: Dp = 150.dp,
+    height: Dp = 164.dp,
     config: RingConfig = RingConfig(
-        size = 64.dp,
+        size = 78.dp,
         thickness = 5.dp,
         color = MaterialTheme.colorScheme.onBackground,
     ),
