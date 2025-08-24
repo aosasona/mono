@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import tools.keystroke.mono.ui.theme.InternationalOrange
 import tools.keystroke.mono.ui.theme.interFamily
 import tools.keystroke.mono.utils.AppInfo
 import tools.keystroke.mono.utils.AppManager
@@ -101,8 +100,7 @@ fun AppDrawer(
             }
 
             Box(
-                modifier = modifier
-                    .fillMaxSize()
+                modifier = modifier.fillMaxSize()
             ) {
                 Column(Modifier.fillMaxSize()) {
                     // MARK: App list
