@@ -20,7 +20,7 @@ fun Root(paddingValues: PaddingValues) {
 
         NavHost(navController = navController, startDestination = "home") {
             composable("home") { HomeView(paddingValues, navController = navController) }
-            composable("app_drawer") { AppDrawer(paddingValues) }
+            composable("app_drawer") { AppDrawer(paddingValues, navController = navController) }
         }
     }
 }

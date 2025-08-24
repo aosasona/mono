@@ -17,13 +17,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -44,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import tools.keystroke.mono.ui.theme.interFamily
 import tools.keystroke.mono.utils.AppInfo
@@ -56,6 +64,7 @@ enum class SearchPosition { Top, Bottom }
 fun AppDrawer(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
+    navController: NavController,
     searchPosition: SearchPosition = SearchPosition.Top,
     horizontalPadding: Dp = 16.dp,
     fontSize: Int = 30,
@@ -84,6 +93,8 @@ fun AppDrawer(
         mutableStateOf(buildLetterIndex(apps))
     }
 
+    fun onExit() = navController.popBackStack()
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -95,7 +106,8 @@ fun AppDrawer(
                 SearchBar(
                     value = TextFieldValue(searchQuery),
                     onQueryChange = { searchQuery = it.text },
-                    horizontalPadding = horizontalPadding
+                    horizontalPadding = horizontalPadding,
+                    onExit = { onExit() },
                 )
             }
 
@@ -110,7 +122,7 @@ fun AppDrawer(
                             .weight(1f)
                     ) {
                         if (searchPosition == SearchPosition.Top) {
-                            item { Spacer(modifier = Modifier.padding(6.dp)) }
+                            item { Spacer(modifier = Modifier.padding(2.dp)) }
                         }
 
                         itemsIndexed(apps, key = { _, item -> item.packageName }) { idx, app ->
@@ -154,7 +166,8 @@ fun AppDrawer(
                 SearchBar(
                     value = TextFieldValue(searchQuery),
                     onQueryChange = { searchQuery = it.text },
-                    horizontalPadding = horizontalPadding
+                    horizontalPadding = horizontalPadding,
+                    onExit = { onExit() },
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -165,27 +178,55 @@ fun AppDrawer(
 }
 
 @Composable
+fun SquareIconButton(
+    onClick: () -> Unit,
+    size: Dp = 72.dp,
+    icon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack,
+    contentDescription: String? = null
+) {
+    Surface(
+        onClick = onClick,
+        shape = RectangleShape,
+        tonalElevation = 2.dp,
+        modifier = Modifier.size(size),
+        color = Color.Transparent
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                modifier = Modifier.size(36.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun SearchBar(
     value: TextFieldValue,
-    onQueryChange: (TextFieldValue) -> Unit,
     horizontalPadding: Dp = 16.dp,
+    onQueryChange: (TextFieldValue) -> Unit,
+    onExit: () -> Unit,
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onQueryChange,
-        singleLine = true,
-        placeholder = {
-            Text(
-                "Search apps",
-                fontFamily = interFamily,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Light,
-            )
-        },
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = horizontalPadding),
-    )
+            .padding(vertical = 10.dp)
+            .padding(end = horizontalPadding), verticalAlignment = Alignment.CenterVertically
+    ) {
+        SquareIconButton(onClick = onExit)
+
+        OutlinedTextField(
+            value = value, onValueChange = onQueryChange, singleLine = true, placeholder = {
+                Text(
+                    "Search apps",
+                    fontFamily = interFamily,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Light,
+                )
+            }, modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 private val Letters = ('A'..'Z').map { it.toString() }
