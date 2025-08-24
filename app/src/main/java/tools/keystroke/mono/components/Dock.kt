@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -51,23 +52,22 @@ data class FavoriteApps(
 @Composable
 fun Dock(
     modifier: Modifier = Modifier,
+    height: Dp = 150.dp,
     config: RingConfig = RingConfig(
         size = 64.dp,
-        thickness = 4.dp,
-        color = MaterialTheme.colorScheme.primary,
+        thickness = 5.dp,
+        color = MaterialTheme.colorScheme.onBackground,
     ),
     favoriteApps: FavoriteApps = FavoriteApps(),
     onOpenDrawer: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val haptics = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
 
     var lastLaunchedApp by remember { mutableStateOf<String?>(null) }
     var tapJob by remember { mutableStateOf<Job?>(null) }
 
     Row(
-        modifier = modifier,
+        modifier = modifier.padding(bottom = height - config.size),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(config.itemSpacing)
     ) {
@@ -81,7 +81,6 @@ fun Dock(
             color = Color.Transparent,
             shape = CircleShape,
             border = BorderStroke(config.thickness, config.color),
-            shadowElevation = 12.dp,
             modifier = Modifier
                 .size(config.size)
                 .clickable(
@@ -104,8 +103,8 @@ fun Dock(
 
 @Composable
 fun DockApp(
-    packageName: String
-    setLastLaunched: (String) -> Unit
+    packageName: String,
+    setLastLaunched: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val haptics = LocalHapticFeedback.current

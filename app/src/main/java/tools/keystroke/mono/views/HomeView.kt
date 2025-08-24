@@ -1,6 +1,5 @@
 package tools.keystroke.mono.views
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,11 +7,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import tools.keystroke.mono.components.Clock
-import tools.keystroke.mono.components.DraggableCircleDock
+import tools.keystroke.mono.components.Dock
 import tools.keystroke.mono.components.HomeStatusBar
 import tools.keystroke.mono.ui.theme.MonoTheme
 
@@ -32,6 +32,16 @@ fun HomeView(
         Clock(modifier = paddingModifier)
 
         Spacer(modifier = Modifier.weight(1f))
+
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+           contentAlignment = Alignment.BottomCenter,
+        ) {
+            Dock {
+            }
+        }
     }
 }
 

@@ -11,7 +11,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import tools.keystroke.mono.ui.theme.MonoTheme
-import tools.keystroke.mono.views.HomeView
+import tools.keystroke.mono.views.Root
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,10 +24,11 @@ class MainActivity : ComponentActivity() {
         controller.hide(WindowInsetsCompat.Type.systemBars())
         controller.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
         setContent {
             MonoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
-                    HomeView(paddingValues)
+                    Root(paddingValues)
                 }
             }
         }

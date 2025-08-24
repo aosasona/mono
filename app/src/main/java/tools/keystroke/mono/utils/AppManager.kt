@@ -1,7 +1,14 @@
 package tools.keystroke.mono.utils
 
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+
+data class AppInfo(
+    val packageName: String,
+    val label: String,
+)
 
 class AppManager {
     companion object {
@@ -33,6 +40,33 @@ class AppManager {
 //            } catch (e: Exception) {
 //                Result.failure(e)
 //            }
+        }
+
+        fun isAppInstalled(context: Context, packageName: String): Boolean {
+            return try {
+                context.packageManager.getPackageInfo(packageName, 0)
+                true
+            } catch (e: Exception) {
+                false
+            }
+        }
+
+        fun getInstalledApps(context: Context): List<AppInfo> {
+            val packageManager = context.packageManager
+            val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+            val activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+
+            return activities
+                .mapNotNull { activity ->
+                    val info = activity.activityInfo?.applicationInfo ?: return@mapNotNull null
+                    val label = packageManager.getApplicationLabel(info).toString()
+                    AppInfo(
+                        packageName = info.packageName,
+                        label = label,
+                    )
+                }
+                .distinctBy { it.packageName }
+                .sortedBy { it.label.lowercase() }
         }
     }
 }
