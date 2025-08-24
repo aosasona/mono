@@ -31,15 +31,14 @@ class AppManager {
         }
 
         fun launchApp(context: Context, packageName: String): Result<Unit> {
-            TODO("Not implemented yet")
-//            return try {
-//                val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
-//                    ?: return Result.failure(Exception("No launch intent found for package: $packageName"))
-//                context.startActivity(launchIntent)
-//                Result.success(Unit)
-//            } catch (e: Exception) {
-//                Result.failure(e)
-//            }
+            return try {
+                val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
+                    ?: return Result.failure(Exception("No launch intent found for package: $packageName"))
+                context.startActivity(launchIntent)
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
 
         fun isAppInstalled(context: Context, packageName: String): Boolean {
@@ -56,17 +55,14 @@ class AppManager {
             val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
             val activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
 
-            return activities
-                .mapNotNull { activity ->
+            return activities.mapNotNull { activity ->
                     val info = activity.activityInfo?.applicationInfo ?: return@mapNotNull null
                     val label = packageManager.getApplicationLabel(info).toString()
                     AppInfo(
                         packageName = info.packageName,
                         label = label,
                     )
-                }
-                .distinctBy { it.packageName }
-                .sortedBy { it.label.lowercase() }
+                }.distinctBy { it.packageName }.sortedBy { it.label.lowercase() }
         }
     }
 }

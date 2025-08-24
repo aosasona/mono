@@ -11,6 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import tools.keystroke.mono.components.Clock
 import tools.keystroke.mono.components.Dock
 import tools.keystroke.mono.components.HomeStatusBar
@@ -21,12 +23,11 @@ import tools.keystroke.mono.ui.theme.MonoTheme
 fun HomeView(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
+    navController: NavController,
 ) {
     val paddingModifier = Modifier.padding(horizontal = 16.dp)
 
     Column {
-        HomeStatusBar(modifier = paddingModifier)
-
         Spacer(modifier = Modifier.padding(18.dp))
 
         Clock(modifier = paddingModifier)
@@ -37,10 +38,9 @@ fun HomeView(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-           contentAlignment = Alignment.BottomCenter,
+            contentAlignment = Alignment.BottomCenter,
         ) {
-            Dock {
-            }
+            Dock(onOpenDrawer = { navController.navigate("app_drawer") })
         }
     }
 }
@@ -48,5 +48,9 @@ fun HomeView(
 @Preview(showBackground = true)
 @Composable
 fun HomePreview() {
-    MonoTheme { HomeView(paddingValues = PaddingValues(16.dp)) }
+    MonoTheme {
+        HomeView(
+            paddingValues = PaddingValues(16.dp), navController = rememberNavController()
+        )
+    }
 }
