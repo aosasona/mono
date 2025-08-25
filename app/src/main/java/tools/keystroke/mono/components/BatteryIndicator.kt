@@ -8,9 +8,13 @@ import android.os.BatteryManager
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +30,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,7 +89,7 @@ fun BatteryIndicator(
     state: BatteryState,
     height: Dp = 12.dp,
     width: Dp = (height * 2.4f).coerceAtLeast(40.dp),
-    radius: Float = 5f,
+    radius: Float = 4f,
     showPercentage: Boolean = true,
     percentageSide: PercentageSide = PercentageSide.RIGHT,
     lowBatteryThreshold: Int = 10,
@@ -148,7 +153,7 @@ fun BatteryIndicator(
 
             val capOffset = size.width - capWidth
             drawRoundRect(
-                color = fillColor,
+                color = if (currentPercentage == 100) fillColor else track,
                 topLeft = Offset(capOffset, size.height * 0.18f),
                 size = Size(capWidth, size.height * 0.60f),
                 cornerRadius = CornerRadius(radius, radius)
@@ -158,5 +163,24 @@ fun BatteryIndicator(
         if (showPercentage && percentageSide == PercentageSide.RIGHT) {
             percentageIndicator()
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BatteryIndicatorPreview() {
+    Column(
+        modifier = Modifier.padding(paddingValues = PaddingValues(16.dp)),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        BatteryIndicator(state = BatteryState(percentage = 75, isCharging = false))
+        Spacer(modifier = Modifier)
+        BatteryIndicator(state = BatteryState(percentage = 45, isCharging = true))
+        Spacer(modifier = Modifier)
+        BatteryIndicator(state = BatteryState(percentage = 10, isCharging = false))
+        Spacer(modifier = Modifier)
+        BatteryIndicator(state = BatteryState(percentage = 5, isCharging = false))
+        Spacer(modifier = Modifier)
+        BatteryIndicator(state = BatteryState(percentage = 100, isCharging = true))
     }
 }
