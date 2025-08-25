@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import androidx.core.net.toUri
 
 data class AppInfo(
     val packageName: String,
     val label: String,
+    val isSystemApp: Boolean
 )
 
 class AppManager {
@@ -56,13 +58,42 @@ class AppManager {
             val activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
 
             return activities.mapNotNull { activity ->
-                    val info = activity.activityInfo?.applicationInfo ?: return@mapNotNull null
-                    val label = packageManager.getApplicationLabel(info).toString()
-                    AppInfo(
-                        packageName = info.packageName,
-                        label = label,
-                    )
-                }.distinctBy { it.packageName }.sortedBy { it.label.lowercase() }
+                val info = activity.activityInfo?.applicationInfo ?: return@mapNotNull null
+                val label = packageManager.getApplicationLabel(info).toString()
+                val isSystemApp = (info.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+                AppInfo(
+                    packageName = info.packageName,
+                    label = label,
+                    isSystemApp = isSystemApp
+                )
+            }.distinctBy { it.packageName }.sortedBy { it.label.lowercase() }
+        }
+
+        fun openAppInfoSettings(context: Context, packageName: String): Result<Unit> {
+            return try {
+                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = "package:$packageName".toUri()
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+        fun requestUninstall(context: Context, packageName: String): Result<Unit> {
+            return try {
+                val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
+                    data = "package:$packageName".toUri()
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+
+                context.startActivity(uninstallIntent)
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
     }
 }

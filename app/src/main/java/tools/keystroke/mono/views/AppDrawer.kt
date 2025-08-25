@@ -1,7 +1,8 @@
 package tools.keystroke.mono.views
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import tools.keystroke.mono.components.AppContextMenu
+import tools.keystroke.mono.components.ContextMenuItem
 import tools.keystroke.mono.ui.theme.interFamily
 import tools.keystroke.mono.utils.AppInfo
 import tools.keystroke.mono.utils.AppManager
@@ -60,6 +63,7 @@ import java.util.Locale
 
 enum class SearchPosition { Top, Bottom }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppDrawer(
     paddingValues: PaddingValues,
@@ -68,11 +72,11 @@ fun AppDrawer(
     searchPosition: SearchPosition = SearchPosition.Top,
     horizontalPadding: Dp = 16.dp,
     fontSize: Int = 30,
-    showIcons: Boolean = true,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val allApps = remember { AppManager.getInstalledApps(context) }
+
+    var allApps = remember { AppManager.getInstalledApps(context) }
 
     var searchQuery by remember { mutableStateOf("") }
     val apps = remember(allApps, searchQuery) {
@@ -94,6 +98,10 @@ fun AppDrawer(
     }
 
     fun onExit() = navController.popBackStack()
+
+    fun updateAppsList() {
+        allApps = AppManager.getInstalledApps(context)
+    }
 
     Box(
         modifier = modifier
@@ -126,21 +134,75 @@ fun AppDrawer(
                         }
 
                         itemsIndexed(apps, key = { _, item -> item.packageName }) { idx, app ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { AppManager.launchApp(context, app.packageName) }
-                                    .padding(vertical = 10.dp, horizontal = horizontalPadding),
-                                verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = app.label,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontFamily = interFamily,
-                                    fontSize = fontSize.sp,
-                                    fontWeight = FontWeight.Light,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
+                            var showContextMenu by remember { mutableStateOf(false) }
+
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .combinedClickable(
+                                            onClick = {
+                                            AppManager.launchApp(
+                                                context, app.packageName
+                                            )
+                                        }, onLongClick = {
+                                            showContextMenu = true
+                                        }, onLongClickLabel = "App options"
+                                        )
+                                        .padding(vertical = 10.dp, horizontal = horizontalPadding),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = app.label,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontFamily = interFamily,
+                                        fontSize = fontSize.sp,
+                                        fontWeight = FontWeight.Light,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+
+                                AppContextMenu(
+                                    expanded = showContextMenu,
+                                    onDismissRequest = { showContextMenu = false },
+                                    items = buildList {
+                                        add(
+                                            ContextMenuItem(
+                                                title = "Open",
+                                                onClick = {
+                                                    AppManager.launchApp(
+                                                        context, app.packageName
+                                                    )
+                                                },
+                                            )
+                                        )
+                                        add(
+                                            ContextMenuItem(
+                                                title = "App info",
+                                                onClick = {
+                                                    AppManager.openAppInfoSettings(
+                                                        context,
+                                                        app.packageName
+                                                    )
+                                                },
+                                            )
+                                        )
+                                        add(
+                                            ContextMenuItem(
+                                                title = "Uninstall",
+                                                onClick = {
+                                                    if (AppManager.requestUninstall(
+                                                            context, app.packageName
+                                                        ).isSuccess
+                                                    ) {
+                                                        updateAppsList()
+                                                    }
+                                                },
+                                                disabled = app.isSystemApp
+                                            )
+                                        )
+                                    })
                             }
                         }
 
