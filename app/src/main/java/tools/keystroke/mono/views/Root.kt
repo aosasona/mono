@@ -15,7 +15,7 @@ import tools.keystroke.mono.components.HomeStatusBar
 fun Root(paddingValues: PaddingValues) {
     val navController = rememberNavController()
 
-    Column {
+    Column() {
         HomeStatusBar(modifier = Modifier.padding(horizontal = 16.dp))
 
         NavHost(navController = navController, startDestination = "home") {

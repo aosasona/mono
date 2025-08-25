@@ -7,6 +7,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -27,8 +29,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MonoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
-                    Root(paddingValues)
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+                        Root(paddingValues)
+                    }
                 }
             }
         }
