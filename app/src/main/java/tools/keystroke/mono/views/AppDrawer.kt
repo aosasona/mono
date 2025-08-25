@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -37,6 +38,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +49,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -75,12 +78,15 @@ fun AppDrawer(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var allApps by remember { mutableStateOf(AppManager.getInstalledApps(context)) }
 
-    var allApps = remember { AppManager.getInstalledApps(context) }
-
-    var searchQuery by remember { mutableStateOf("") }
+    var searchQuery by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(
+            TextFieldValue("")
+        )
+    }
     val apps = remember(allApps, searchQuery) {
-        val query = searchQuery.trim().lowercase(Locale.getDefault())
+        val query = searchQuery.text.trim().lowercase(Locale.getDefault())
         if (query.isEmpty()) {
             return@remember allApps
         }
@@ -112,8 +118,8 @@ fun AppDrawer(
             // MARK: top search bar
             if (searchPosition == SearchPosition.Top) {
                 SearchBar(
-                    value = TextFieldValue(searchQuery),
-                    onQueryChange = { searchQuery = it.text },
+                    value = searchQuery,
+                    onQueryChange = { searchQuery = it },
                     horizontalPadding = horizontalPadding,
                     onExit = { onExit() },
                 )
@@ -182,24 +188,21 @@ fun AppDrawer(
                                                 title = "App info",
                                                 onClick = {
                                                     AppManager.openAppInfoSettings(
-                                                        context,
-                                                        app.packageName
+                                                        context, app.packageName
                                                     )
                                                 },
                                             )
                                         )
                                         add(
                                             ContextMenuItem(
-                                                title = "Uninstall",
-                                                onClick = {
+                                                title = "Uninstall", onClick = {
                                                     if (AppManager.requestUninstall(
                                                             context, app.packageName
                                                         ).isSuccess
                                                     ) {
                                                         updateAppsList()
                                                     }
-                                                },
-                                                disabled = app.isSystemApp
+                                                }, disabled = app.isSystemApp
                                             )
                                         )
                                     })
@@ -226,8 +229,8 @@ fun AppDrawer(
             // MARK: bottom search bar
             if (searchPosition == SearchPosition.Bottom) {
                 SearchBar(
-                    value = TextFieldValue(searchQuery),
-                    onQueryChange = { searchQuery = it.text },
+                    value = searchQuery,
+                    onQueryChange = { searchQuery = it },
                     horizontalPadding = horizontalPadding,
                     onExit = { onExit() },
                 )
@@ -279,14 +282,19 @@ private fun SearchBar(
         SquareIconButton(onClick = onExit)
 
         OutlinedTextField(
-            value = value, onValueChange = onQueryChange, singleLine = true, placeholder = {
+            value = value,
+            onValueChange = onQueryChange,
+            singleLine = true,
+            placeholder = {
                 Text(
                     "Search apps",
                     fontFamily = interFamily,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Light,
                 )
-            }, modifier = Modifier.fillMaxWidth()
+            },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search)
         )
     }
 }
